@@ -31,13 +31,18 @@ jobs:
           print(f"Validated {count} dictionary entries")
           db.close()
           PY
-      - name: Publish versioned database release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: dictionary-${{ github.run_number }}-${{ github.run_id }}
-          name: Dizionario italiano ${{ github.run_number }}
-          body: |
-            Database offline aggiornato automaticamente da Kaikki/Wiktextract.
-            Include le voci curate del progetto.
-          files: app/src/main/assets/dictionary.db
-          make_latest: true
+      - name: Publish compressed dictionary update
+        run: |
+          mkdir -p updates
+          gzip -c app/src/main/assets/dictionary.db > updates/dictionary.db.gz
+          cat > updates/dictionary-manifest.json <<EOF
+          {
+            "version": "scheduled-${GITHUB_RUN_NUMBER}",
+            "url": "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/updates/dictionary.db.gz"
+          }
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add updates/dictionary.db.gz updates/dictionary-manifest.json
+          git commit -m "Publish scheduled dictionary update ${GITHUB_RUN_NUMBER}" || exit 0
+          git push origin HEAD:main

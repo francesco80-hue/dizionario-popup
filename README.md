@@ -1,17 +1,23 @@
 # Dizionario Popup
 
-Prototipo Android in Kotlin e Jetpack Compose.
+App Android offline per consultare definizioni mentre si legge in JW Library.
 
-- Riceve il testo selezionato tramite ACTION_PROCESS_TEXT.
-- Ricerca locale, senza Internet.
-- Non richiede Accessibilità, overlay, account o pubblicità.
-- Include sei voci dimostrative: non è ancora il dizionario completo.
+## Funzionamento
+
+- Seleziona e copia una parola in JW Library.
+- Tocca il pulsante mobile D.
+- Si apre una scheda con definizione, sinonimi ed esempi disponibili.
+- Il pulsante mobile richiede il permesso Android "Mostra sopra altre app" e una notifica di servizio.
+- L'app non usa Accessibilità, non legge lo schermo e non richiede connessione Internet durante la consultazione.
+
+## Dizionario
+
+Durante ogni compilazione GitHub Actions scarica il dataset italiano Wiktionary da Kaikki.org e genera un archivio compatto incorporato nell'APK. Le voci includono definizioni, sinonimi, esempi e forme flesse quando disponibili nella fonte. I contenuti non presenti nella fonte non vengono inventati.
+
+Sei voci curate manualmente sono conservate in dictionary-curated.json e hanno precedenza sulle voci importate.
+
+Fonti e licenze: vedere [DICTIONARY-LICENSE.md](DICTIONARY-LICENSE.md).
 
 ## Compilazione
-Aprire il progetto con Android Studio, JDK 17 e Android SDK 35. Il workflow GitHub Actions compila automaticamente l'APK debug; aprire Actions e scaricare l'artifact DizionarioPopup-debug-apk.
 
-## Test
-Installare l'APK, selezionare una parola in un'app compatibile e cercare Dizionario Popup nel menu di condivisione/azioni. La compatibilità con JW Library e HyperOS va verificata sul tablet.
-
-## Dizionario esteso
-Il dataset completo non è incluso. È possibile scaricare i dati italiani da https://kaikki.org/itwiktionary/rawdata.html e convertirli con tools/convert_wiktextract.py. Verificare e rispettare licenze e attribuzioni CC BY-SA/GFDL prima di redistribuire i dati.
+Aprire Actions nel repository e scaricare l'artifact DizionarioPopup-debug-apk dell'ultima esecuzione completata con successo.

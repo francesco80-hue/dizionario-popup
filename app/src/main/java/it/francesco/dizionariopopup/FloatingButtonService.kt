@@ -136,11 +136,14 @@ class FloatingButtonService : Service() {
         }
     }
 
-    private fun showLookupPopup() {
-        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        val copied = if (clipboard.hasPrimaryClip()) {
-            clipboard.primaryClip?.getItemAt(0)?.coerceToText(this)?.toString()?.trim().orEmpty()
-        } else ""
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == ACTION_SHOW_LOOKUP) {
+            showLookupPopup(intent.getStringExtra(EXTRA_COPIED_TEXT).orEmpty())
+        }
+        return START_STICKY
+    }
+
+    private fun showLookupPopup(copied: String) {
         val word = copied.split(Regex("\\s+")).firstOrNull().orEmpty()
             .trim(' ', '.', ',', ';', ':', '!', '?', '“', '”', '"', '(', ')', '[', ']')
         val entry = if (word.isNotBlank()) Dictionary.find(this, word) else null
@@ -258,6 +261,8 @@ class FloatingButtonService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     companion object {
+        const val ACTION_SHOW_LOOKUP = "it.francesco.dizionariopopup.SHOW_LOOKUP"
+        const val EXTRA_COPIED_TEXT = "copied_text"
         private const val CHANNEL_ID = "dictionary_floating"
         private const val NOTIFICATION_ID = 7101
         private const val PREFS = "floating_button_settings"

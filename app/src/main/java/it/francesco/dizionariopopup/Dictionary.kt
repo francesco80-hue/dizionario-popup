@@ -1,7 +1,7 @@
 package it.francesco.dizionariopopup
 
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteDatabase\nimport java.io.File
 import org.json.JSONArray
 import java.text.Normalizer
 import java.util.Locale
@@ -33,7 +33,7 @@ object Dictionary {
         }
     }
 
-    private fun openDatabase(context: Context): SQLiteDatabase {
+    @Synchronized\n    fun installDatabase(context: Context, downloaded: File): Boolean {\n        val check = SQLiteDatabase.openDatabase(downloaded.absolutePath, null, SQLiteDatabase.OPEN_READONLY)\n        try {\n            check.rawQuery("SELECT word_key FROM entries LIMIT 1", null).use { cursor ->\n                if (!cursor.moveToFirst()) return false\n            }\n        } finally {\n            check.close()\n        }\n        val target = context.getDatabasePath(DATABASE_NAME)\n        target.parentFile?.let { if (!it.exists()) it.mkdirs() }\n        val backup = File(target.parentFile, "$DATABASE_NAME.previous")\n        if (target.exists() && !target.renameTo(backup)) return false\n        if (!downloaded.renameTo(target)) {\n            if (backup.exists()) backup.renameTo(target)\n            return false\n        }\n        backup.delete()\n        return true\n    }\n\n    private fun openDatabase(context: Context): SQLiteDatabase {
         val target = context.getDatabasePath(DATABASE_NAME)
         if (!target.exists()) {
             target.parentFile?.let { if (!it.exists()) it.mkdirs() }

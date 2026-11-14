@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.ClipboardManager
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
@@ -12,8 +13,12 @@ import android.os.Build
 import android.os.IBinder
 import android.view.Gravity
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewConfiguration
 import android.view.WindowManager
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.app.NotificationCompat
 import kotlin.math.abs
@@ -21,6 +26,7 @@ import kotlin.math.abs
 class FloatingButtonService : Service() {
     private var windowManager: WindowManager? = null
     private var bubble: TextView? = null
+    private var popup: View? = null
     private var layoutParams: WindowManager.LayoutParams? = null
     private var downRawX = 0f
     private var downRawY = 0f
@@ -51,6 +57,13 @@ class FloatingButtonService : Service() {
         showBubble()
     }
 
+    private fun overlayType(): Int =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+        else {
+            @Suppress("DEPRECATION")
+            WindowManager.LayoutParams.TYPE_PHONE
+        }
+
     private fun showBubble() {
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         val view = TextView(this).apply {
@@ -67,16 +80,9 @@ class FloatingButtonService : Service() {
             elevation = dp(5).toFloat()
         }
         bubble = view
-
-        val type = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-        } else {
-            @Suppress("DEPRECATION")
-            WindowManager.LayoutParams.TYPE_PHONE
-        }
         val prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
         val params = WindowManager.LayoutParams(
-            dp(44), dp(44), type,
+            dp(44), dp(44), overlayType(),
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
             PixelFormat.TRANSLUCENT
         ).apply {
@@ -115,7 +121,7 @@ class FloatingButtonService : Service() {
                             .putInt("bubble_y", params.y)
                             .apply()
                     } else {
-                        openLookup()
+                        showLookupPopup()
                     }
                     true
                 }
@@ -123,7 +129,6 @@ class FloatingButtonService : Service() {
                 else -> false
             }
         }
-
         try {
             windowManager?.addView(view, params)
         } catch (_: Exception) {
@@ -131,12 +136,106 @@ class FloatingButtonService : Service() {
         }
     }
 
-    private fun openLookup() {
-        val intent = Intent(this, LookupActivity::class.java).apply {
-            putExtra(LookupActivity.EXTRA_READ_CLIPBOARD, true)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+    private fun showLookupPopup() {
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        val copied = if (clipboard.hasPrimaryClip()) {
+            clipboard.primaryClip?.getItemAt(0)?.coerceToText(this)?.toString()?.trim().orEmpty()
+        } else ""
+        val word = copied.split(Regex("\\s+")).firstOrNull().orEmpty()
+            .trim(' ', '.', ',', ';', ':', '!', '?', '“', '”', '"', '(', ')', '[', ']')
+        val entry = if (word.isNotBlank()) Dictionary.find(this, word) else null
+
+        bubble?.visibility = View.GONE
+        popup?.let { try { windowManager?.removeView(it) } catch (_: Exception) {} }
+
+        val panel = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(22), dp(18), dp(22), dp(14))
+            background = GradientDrawable().apply {
+                setColor(Color.rgb(255, 248, 252))
+                cornerRadius = dp(18).toFloat()
+                setStroke(dp(1), Color.rgb(225, 215, 225))
+            }
+            elevation = dp(12).toFloat()
         }
-        startActivity(intent)
+
+        val header = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        val title = TextView(this).apply {
+            text = "Dizionario Popup"
+            textSize = 18f
+            setTextColor(Color.rgb(55, 45, 60))
+        }
+        header.addView(title, LinearLayout.LayoutParams(0, dp(44), 1f))
+        val close = Button(this).apply {
+            text = "Chiudi"
+            setTextColor(Color.rgb(175, 35, 60))
+            setOnClickListener { closeLookupPopup() }
+        }
+        header.addView(close)
+        panel.addView(header)
+
+        val scroll = ScrollView(this)
+        val body = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(0, dp(8), 0, dp(8))
+        }
+        fun addText(value: String, size: Float, color: Int = Color.rgb(45, 40, 48), bold: Boolean = false, top: Int = 8) {
+            val text = TextView(this).apply {
+                this.text = value
+                textSize = size
+                setTextColor(color)
+                if (bold) setTypeface(typeface, android.graphics.Typeface.BOLD)
+                setPadding(0, dp(top), 0, dp(3))
+            }
+            body.addView(text)
+        }
+
+        if (entry != null) {
+            addText(entry.word, 27f, Color.rgb(45, 40, 48), true, 4)
+            if (entry.pos.isNotBlank()) addText(entry.pos, 13f, Color.rgb(130, 75, 145), false, 2)
+            addText("VOCABOLARIO", 14f, Color.rgb(65, 55, 65), true, 14)
+            addText(entry.definition, 17f)
+            if (entry.synonyms.isNotEmpty()) {
+                addText("Sinonimi", 15f, Color.rgb(65, 55, 65), true, 12)
+                addText(entry.synonyms.joinToString(" · "), 16f)
+            }
+            if (entry.examples.isNotEmpty()) {
+                addText("Esempio", 15f, Color.rgb(65, 55, 65), true, 12)
+                entry.examples.forEach { addText("“$it”", 16f) }
+            }
+            addText("APPROFONDIMENTO ENCICLOPEDICO", 14f, Color.rgb(65, 55, 65), true, 16)
+            addText(entry.encyclopedia.ifBlank { "Nessun approfondimento enciclopedico disponibile per questa voce." }, 16f)
+        } else {
+            addText(word.ifBlank { "Nessuna parola copiata" }, 24f, Color.rgb(45, 40, 48), true, 8)
+            addText(if (word.isBlank()) "Copia una parola in JW Library e tocca il libro rosso." else "La parola non è presente nel dizionario.", 16f)
+        }
+
+        scroll.addView(body)
+        panel.addView(scroll, LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT, dp(360)
+        ))
+        popup = panel
+        val width = (resources.displayMetrics.widthPixels * 0.90f).toInt().coerceAtMost(dp(560))
+        val params = WindowManager.LayoutParams(
+            width, WindowManager.LayoutParams.WRAP_CONTENT, overlayType(),
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+            PixelFormat.TRANSLUCENT
+        ).apply { gravity = Gravity.CENTER }
+        try {
+            windowManager?.addView(panel, params)
+        } catch (_: Exception) {
+            popup = null
+            bubble?.visibility = View.VISIBLE
+        }
+    }
+
+    private fun closeLookupPopup() {
+        popup?.let { try { windowManager?.removeView(it) } catch (_: Exception) {} }
+        popup = null
+        bubble?.visibility = View.VISIBLE
     }
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
@@ -149,7 +248,9 @@ class FloatingButtonService : Service() {
     }
 
     override fun onDestroy() {
+        popup?.let { try { windowManager?.removeView(it) } catch (_: Exception) {} }
         bubble?.let { try { windowManager?.removeView(it) } catch (_: Exception) {} }
+        popup = null
         bubble = null
         super.onDestroy()
     }

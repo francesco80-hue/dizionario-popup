@@ -56,3 +56,17 @@ La compilazione produce un APK di prova e, quando sono configurati i segreti di 
 - L'icona definitiva è ancora da scegliere.
 - Evitare simboli generici troppo simili alle icone di dizionari già esistenti.
 - Cercare un'identità originale, riconoscibile anche in piccolo e coerente con il pulsante flottante rosso, senza considerare ancora approvata una proposta.
+
+
+## Popup aggiornato: approfondimenti facoltativi
+
+La finestra di consultazione mantiene definizione, sinonimi ed esempi in primo piano. La sezione "Approfondisci" è compatta e chiusa inizialmente; su richiesta apre:
+- Google, con ricerca del significato della parola;
+- Wikipedia in italiano, con ricerca della voce;
+- Altre fonti linguistiche, tramite ricerca mirata su Treccani.
+
+Questi collegamenti richiedono Internet e vengono aperti soltanto quando l'utente li seleziona. La consultazione del dizionario locale continua a funzionare offline. Non sono previsti collegamenti a JW.org o alla Biblioteca Online.
+
+## Aggiornamenti futuri del database
+
+È confermata la separazione tra aggiornamenti dell'app e aggiornamenti del dizionario. Il download autonomo del database, il controllo periodico e l'opzione solo Wi-Fi sono ancora da implementare: prima occorre scegliere e predisporre un indirizzo di hosting stabile per il database e un semplice manifest di versione. Fino ad allora, il database resta quello incluso nell'APK.

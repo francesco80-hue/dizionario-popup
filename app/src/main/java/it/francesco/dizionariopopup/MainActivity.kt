@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
                             Text(result.word, style = MaterialTheme.typography.headlineMedium)
                             Text(result.definition)
                             Text("Sinonimi: " + result.synonyms.joinToString(", "))
-                            if (result.examples.isNotEmpty()) Text("Esempio: " + result.examples.first)
+                            if (result.examples.isNotEmpty()) Text("Esempio: " + result.examples.first())
                         } else if (query.isNotBlank()) Text("Nessun risultato. Prova un'altra parola.")
                         Text("Google, Wikipedia e altre fonti si aprono solo su richiesta e richiedono Internet. Il dizionario continua a funzionare offline.", style = MaterialTheme.typography.bodySmall)
                     }

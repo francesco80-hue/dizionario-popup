@@ -14,29 +14,29 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-
+      - name: Download Italian dictionary source
+        run: |
+          mkdir -p build-data
+          curl -L --fail --retry 3 https://kaikki.org/itwiktionary/raw-wiktextract-data.jsonl.gz -o build-data/itwiktionary.jsonl.gz
+      - name: Build compact offline dictionary
+        run: python3 tools/build_dictionary.py
       - name: Set up Android SDK command-line tools
         uses: android-actions/setup-android@v4
         with:
           packages: ''
-
       - name: Install Android platform and build tools
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
-
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-
       - name: Build debug APK
         run: gradle --no-daemon assembleDebug
-
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:

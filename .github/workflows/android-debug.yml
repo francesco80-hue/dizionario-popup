@@ -26,13 +26,22 @@ jobs:
       - name: Build compact offline dictionary
         run: python3 tools/build_dictionary.py
       - name: Publish current dictionary database
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: dictionary-build-${{ github.run_number }}-${{ github.run_id }}
-          name: Dizionario italiano build ${{ github.run_number }}
-          body: Database offline generato da Kaikki/Wiktextract e dalle voci curate del progetto.
-          files: app/src/main/assets/dictionary.db
-          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p updates
+          gzip -c app/src/main/assets/dictionary.db > updates/dictionary.db.gz
+          cat > updates/dictionary-manifest.json <<EOF
+          {
+            "version": "${GITHUB_RUN_NUMBER}",
+            "url": "https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/main/updates/dictionary.db.gz"
+          }
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add updates/dictionary.db.gz updates/dictionary-manifest.json
+          git commit -m "Publish offline dictionary database ${GITHUB_RUN_NUMBER}" || exit 0
+          git push origin HEAD:main
       - name: Set up Android SDK command-line tools
         uses: android-actions/setup-android@v4
         with:

@@ -1,11 +1,315 @@
 [
- {"word":"perseveranza","pos":"sostantivo femminile","definition":"Costanza nel perseguire un obiettivo, nonostante difficoltà e ostacoli.","synonyms":["tenacia","costanza","determinazione"],"examples":["Affrontò le difficoltà con perseveranza."],"encyclopedia":"La perseveranza è la disposizione a continuare un'attività o un impegno nel tempo, anche in presenza di ostacoli. In psicologia è spesso collegata all'autoregolazione e alla motivazione."},
- {"word":"mitezza","pos":"sostantivo femminile","definition":"Qualità di chi è mite: pacato, gentile e non incline alla durezza o alla violenza.","synonyms":["mansuetudine","pacatezza","dolcezza"],"examples":["Rispose con mitezza anche alle provocazioni."],"encyclopedia":"La mitezza è una qualità morale e relazionale associata a moderazione, autocontrollo e gentilezza."},
- {"word":"integrità","pos":"sostantivo femminile","definition":"Qualità di chi è integro e coerente nei principi morali; onestà e rettitudine.","synonyms":["rettitudine","onestà","lealtà"],"examples":["Agì con integrità anche quando nessuno lo osservava."],"encyclopedia":"In etica, l'integrità indica coerenza tra valori dichiarati, decisioni e comportamento."},
- {"word":"discernimento","pos":"sostantivo maschile","definition":"Capacità di valutare e distinguere con giudizio ciò che è opportuno, vero o importante.","synonyms":["giudizio","criterio","avvedutezza"],"examples":["Prese la decisione con discernimento."],"encyclopedia":"Il discernimento è un processo di valutazione che confronta informazioni, contesto e conseguenze prima di formulare un giudizio."},
- {"word":"costanza","pos":"sostantivo femminile","definition":"Continuità e fermezza nel mantenere un comportamento, un impegno o un proposito.","synonyms":["perseveranza","tenacia","assiduità"],"examples":["La costanza nello studio porta risultati."],"encyclopedia":"La costanza descrive la stabilità di un comportamento o di una proprietà nel tempo."},
- {"word":"saggezza","pos":"sostantivo femminile","definition":"Capacità di giudicare e agire con prudenza, equilibrio e conoscenza.","synonyms":["sapienza","prudenza","senno"],"examples":["La saggezza aiuta a scegliere le parole giuste."],"encyclopedia":"La saggezza è studiata in filosofia e psicologia come forma di conoscenza pratica che integra esperienza, giudizio e considerazione degli altri."}
-,
- {"word":"sacrificare","pos":"verbo transitivo","definition":"Rinunciare volontariamente a qualcosa di proprio o a un vantaggio per uno scopo, un valore o il bene di qualcuno. 1. Privarsi di qualcosa di desiderato o utile: sacrificare il tempo libero per un impegno. 2. Mettere a rischio o perdere qualcosa per ottenere un risultato: sacrificare una comodità per raggiungere un obiettivo. 3. Dedicare completamente tempo, energie o risorse a una persona o a una causa. In senso storico o religioso, offrire una vittima o qualcosa in un rito sacro.","synonyms":["rinunciare","immolare","offrire","consacrare","dedicare","privarsi","abbandonare"],"examples":["Ha sacrificato parte del suo tempo libero per aiutare la famiglia.","Non bisogna sacrificare la salute per il lavoro.","Era disposto a sacrificare i propri interessi per il bene comune."],"encyclopedia":""},
- {"word":"sacrificio","pos":"sostantivo maschile","definition":"Rinuncia volontaria a qualcosa di desiderato o utile per uno scopo ritenuto più importante. Può indicare anche una privazione, uno sforzo gravoso o, in ambito religioso, un'offerta rituale.","synonyms":["rinuncia","privazione","abnegazione","immolazione","offerta"],"examples":["Il suo sacrificio ha permesso alla famiglia di affrontare quel periodo.","Per raggiungere l'obiettivo è stato necessario qualche sacrificio."],"encyclopedia":""}
+  {
+    "word": "perseveranza",
+    "pos": "sostantivo femminile",
+    "definition": "Costanza nel perseguire un obiettivo, nonostante difficoltà e ostacoli.",
+    "synonyms": [
+      "tenacia",
+      "costanza",
+      "determinazione"
+    ],
+    "examples": [
+      "Affrontò le difficoltà con perseveranza."
+    ],
+    "encyclopedia": "La perseveranza è la disposizione a continuare un'attività o un impegno nel tempo, anche in presenza di ostacoli. In psicologia è spesso collegata all'autoregolazione e alla motivazione."
+  },
+  {
+    "word": "mitezza",
+    "pos": "sostantivo femminile",
+    "definition": "Qualità di chi è mite: pacato, gentile e non incline alla durezza o alla violenza.",
+    "synonyms": [
+      "mansuetudine",
+      "pacatezza",
+      "dolcezza"
+    ],
+    "examples": [
+      "Rispose con mitezza anche alle provocazioni."
+    ],
+    "encyclopedia": "La mitezza è una qualità morale e relazionale associata a moderazione, autocontrollo e gentilezza."
+  },
+  {
+    "word": "integrità",
+    "pos": "sostantivo femminile",
+    "definition": "Qualità di chi è integro e coerente nei principi morali; onestà e rettitudine.",
+    "synonyms": [
+      "rettitudine",
+      "onestà",
+      "lealtà"
+    ],
+    "examples": [
+      "Agì con integrità anche quando nessuno lo osservava."
+    ],
+    "encyclopedia": "In etica, l'integrità indica coerenza tra valori dichiarati, decisioni e comportamento."
+  },
+  {
+    "word": "discernimento",
+    "pos": "sostantivo maschile",
+    "definition": "Capacità di valutare e distinguere con giudizio ciò che è opportuno, vero o importante.",
+    "synonyms": [
+      "giudizio",
+      "criterio",
+      "avvedutezza"
+    ],
+    "examples": [
+      "Prese la decisione con discernimento."
+    ],
+    "encyclopedia": "Il discernimento è un processo di valutazione che confronta informazioni, contesto e conseguenze prima di formulare un giudizio."
+  },
+  {
+    "word": "costanza",
+    "pos": "sostantivo femminile",
+    "definition": "Continuità e fermezza nel mantenere un comportamento, un impegno o un proposito.",
+    "synonyms": [
+      "perseveranza",
+      "tenacia",
+      "assiduità"
+    ],
+    "examples": [
+      "La costanza nello studio porta risultati."
+    ],
+    "encyclopedia": "La costanza descrive la stabilità di un comportamento o di una proprietà nel tempo."
+  },
+  {
+    "word": "saggezza",
+    "pos": "sostantivo femminile",
+    "definition": "Capacità di giudicare e agire con prudenza, equilibrio e conoscenza.",
+    "synonyms": [
+      "sapienza",
+      "prudenza",
+      "senno"
+    ],
+    "examples": [
+      "La saggezza aiuta a scegliere le parole giuste."
+    ],
+    "encyclopedia": "La saggezza è studiata in filosofia e psicologia come forma di conoscenza pratica che integra esperienza, giudizio e considerazione degli altri."
+  },
+  {
+    "word": "sacrificare",
+    "pos": "verbo transitivo",
+    "definition": "Rinunciare volontariamente a qualcosa di proprio o a un vantaggio per uno scopo, un valore o il bene di qualcuno. 1. Privarsi di qualcosa di desiderato o utile: sacrificare il tempo libero per un impegno. 2. Mettere a rischio o perdere qualcosa per ottenere un risultato: sacrificare una comodità per raggiungere un obiettivo. 3. Dedicare completamente tempo, energie o risorse a una persona o a una causa. In senso storico o religioso, offrire una vittima o qualcosa in un rito sacro.",
+    "synonyms": [
+      "rinunciare",
+      "immolare",
+      "offrire",
+      "consacrare",
+      "dedicare",
+      "privarsi",
+      "abbandonare"
+    ],
+    "examples": [
+      "Ha sacrificato parte del suo tempo libero per aiutare la famiglia.",
+      "Non bisogna sacrificare la salute per il lavoro.",
+      "Era disposto a sacrificare i propri interessi per il bene comune."
+    ],
+    "encyclopedia": ""
+  },
+  {
+    "word": "sacrificio",
+    "pos": "sostantivo maschile",
+    "definition": "Rinuncia volontaria a qualcosa di desiderato o utile per uno scopo ritenuto più importante. Può indicare anche una privazione, uno sforzo gravoso o, in ambito religioso, un'offerta rituale.",
+    "synonyms": [
+      "rinuncia",
+      "privazione",
+      "abnegazione",
+      "immolazione",
+      "offerta"
+    ],
+    "examples": [
+      "Il suo sacrificio ha permesso alla famiglia di affrontare quel periodo.",
+      "Per raggiungere l'obiettivo è stato necessario qualche sacrificio."
+    ],
+    "encyclopedia": ""
+  },
+  {
+    "word": "umiltà",
+    "pos": "sostantivo femminile",
+    "definition": "Atteggiamento di chi riconosce con equilibrio i propri limiti e qualità, senza superbia né ostentazione. Non significa sminuirsi, ma avere un'opinione realistica di sé.",
+    "synonyms": [
+      "modestia",
+      "semplicità",
+      "mansuetudine",
+      "assenza di presunzione"
+    ],
+    "examples": [
+      "Rispose con umiltà, senza cercare riconoscimenti."
+    ],
+    "encyclopedia": ""
+  },
+  {
+    "word": "generosità",
+    "pos": "sostantivo femminile",
+    "definition": "Disponibilità a dare, condividere o aiutare senza aspettarsi un vantaggio personale; può riferirsi anche a larghezza d'animo e nobiltà di sentimenti.",
+    "synonyms": [
+      "altruismo",
+      "liberalità",
+      "magnanimità",
+      "munificenza",
+      "disinteresse"
+    ],
+    "examples": [
+      "La sua generosità si vedeva nei piccoli gesti quotidiani."
+    ],
+    "encyclopedia": ""
+  },
+  {
+    "word": "altruismo",
+    "pos": "sostantivo maschile",
+    "definition": "Disposizione a interessarsi del bene degli altri e ad agire a loro favore, anche mettendo in secondo piano il proprio vantaggio.",
+    "synonyms": [
+      "generosità",
+      "disinteresse",
+      "abnegazione",
+      "benevolenza",
+      "solidarietà"
+    ],
+    "examples": [
+      "Agì con altruismo, pensando prima alle necessità degli altri."
+    ],
+    "encyclopedia": ""
+  },
+  {
+    "word": "pazienza",
+    "pos": "sostantivo femminile",
+    "definition": "Capacità di sopportare attese, difficoltà o comportamenti irritanti con calma e perseveranza, senza perdere il controllo.",
+    "synonyms": [
+      "tolleranza",
+      "sopportazione",
+      "longanimità",
+      "costanza",
+      "calma"
+    ],
+    "examples": [
+      "Con pazienza spiegò di nuovo il procedimento."
+    ],
+    "encyclopedia": ""
+  },
+  {
+    "word": "coraggio",
+    "pos": "sostantivo maschile",
+    "definition": "Forza d'animo che permette di affrontare pericoli, difficoltà o situazioni impegnative senza lasciarsi dominare dalla paura.",
+    "synonyms": [
+      "ardimento",
+      "audacia",
+      "valentia",
+      "determinazione",
+      "fermezza",
+      "animo"
+    ],
+    "examples": [
+      "Mostrò coraggio di fronte a una situazione difficile."
+    ],
+    "encyclopedia": ""
+  },
+  {
+    "word": "benevolenza",
+    "pos": "sostantivo femminile",
+    "definition": "Disposizione favorevole verso gli altri, accompagnata da gentilezza, comprensione e desiderio del loro bene.",
+    "synonyms": [
+      "benevolità",
+      "benevolo interesse",
+      "gentilezza",
+      "cordialità",
+      "indulgenza"
+    ],
+    "examples": [
+      "Lo accolse con benevolenza e comprensione."
+    ],
+    "encyclopedia": ""
+  },
+  {
+    "word": "compassione",
+    "pos": "sostantivo femminile",
+    "definition": "Partecipazione alla sofferenza altrui, unita al desiderio di alleviarla con parole o azioni.",
+    "synonyms": [
+      "compassionevolezza",
+      "pietà",
+      "commiserazione",
+      "partecipazione",
+      "empatia"
+    ],
+    "examples": [
+      "La compassione lo spinse ad aiutare chi era in difficoltà."
+    ],
+    "encyclopedia": ""
+  },
+  {
+    "word": "lealtà",
+    "pos": "sostantivo femminile",
+    "definition": "Qualità di chi è fedele agli impegni, sincero nei rapporti e corretto nel comportamento, senza inganno o doppiezza.",
+    "synonyms": [
+      "fedeltà",
+      "franchezza",
+      "correttezza",
+      "onestà",
+      "sincerità"
+    ],
+    "examples": [
+      "La lealtà si dimostra soprattutto quando è difficile essere sinceri."
+    ],
+    "encyclopedia": ""
+  },
+  {
+    "word": "fedeltà",
+    "pos": "sostantivo femminile",
+    "definition": "Costanza nel mantenere un impegno, una promessa o un legame; adesione sincera a una persona, a un principio o a un dovere.",
+    "synonyms": [
+      "lealtà",
+      "costanza",
+      "dedizione",
+      "devozione",
+      "attaccamento"
+    ],
+    "examples": [
+      "Dimostrò fedeltà ai propri principi."
+    ],
+    "encyclopedia": ""
+  },
+  {
+    "word": "modestia",
+    "pos": "sostantivo femminile",
+    "definition": "Atteggiamento di chi non ostenta capacità o meriti e non cerca di mettersi al di sopra degli altri; può indicare anche misura e sobrietà.",
+    "synonyms": [
+      "umiltà",
+      "semplicità",
+      "sobrietà",
+      "riservatezza",
+      "discrezione"
+    ],
+    "examples": [
+      "Parlava dei propri risultati con modestia."
+    ],
+    "encyclopedia": ""
+  },
+  {
+    "word": "rispetto",
+    "pos": "sostantivo maschile",
+    "definition": "Considerazione e riguardo per il valore, i diritti, i sentimenti o la dignità di qualcuno; osservanza di regole, impegni o principi.",
+    "synonyms": [
+      "riguardo",
+      "stima",
+      "considerazione",
+      "deferenza",
+      "ossequio"
+    ],
+    "examples": [
+      "Ascoltò il punto di vista altrui con rispetto."
+    ],
+    "encyclopedia": ""
+  },
+  {
+    "word": "speranza",
+    "pos": "sostantivo femminile",
+    "definition": "Attesa fiduciosa che qualcosa di desiderato o ritenuto positivo possa realizzarsi; fiducia nella possibilità di un esito favorevole.",
+    "synonyms": [
+      "fiducia",
+      "aspettativa",
+      "attesa",
+      "ottimismo",
+      "confidenza"
+    ],
+    "examples": [
+      "Non perse la speranza nonostante le difficoltà."
+    ],
+    "encyclopedia": ""
+  }
 ]

@@ -61,7 +61,7 @@ class FloatingButtonService : Service() {
             alpha = 0.92f
             background = GradientDrawable().apply {
                 shape = GradientDrawable.OVAL
-                setColor(Color.rgb(35, 100, 190))
+                setColor(Color.rgb(210, 45, 65))
                 setStroke(dp(1), Color.argb(150, 255, 255, 255))
             }
             elevation = dp(5).toFloat()

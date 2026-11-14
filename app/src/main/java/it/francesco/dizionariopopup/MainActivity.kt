@@ -23,12 +23,12 @@ class MainActivity : ComponentActivity() {
         overlayGranted = Settings.canDrawOverlays(this)
         setContent {
             MaterialTheme {
-                var query by remember { mutableStateOf("perseveranza") }
+                var query by remember { mutableStateOf("") }
                 val result = remember(query) { Dictionary.find(this, query) }
                 Scaffold { padding ->
                     Column(Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Text("Dizionario Popup", style = MaterialTheme.typography.headlineLarge)
-                        Text("Dizionario locale, senza account, pubblicità, Internet o Accessibilità.")
+                        Text("Consulta le parole mentre leggi, senza uscire da JW Library. Dizionario offline: nessun account, pubblicità o connessione Internet.")
                         HorizontalDivider()
                         Text("PULSANTE MOBILE", style = MaterialTheme.typography.titleMedium)
                         Text(if (overlayGranted) "Permesso finestra mobile autorizzato." else "Per mostrare l'icona sopra JW Library serve il permesso Android 'Mostra sopra altre app'.")
@@ -44,7 +44,12 @@ class MainActivity : ComponentActivity() {
                         OutlinedButton(onClick = {
                             stopService(Intent(this@MainActivity, FloatingButtonService::class.java))
                         }, modifier = Modifier.fillMaxWidth()) { Text("Disattiva icona mobile") }
-                        Text("Dopo aver copiato una parola in JW Library, tocca la D mobile per aprire la scheda del dizionario.")
+                        Text("COME SI USA")
+                        Text("1. In JW Library, tieni premuta la parola che vuoi cercare.")
+                        Text("2. Tocca Copia nel menu.")
+                        Text("3. Tocca il libro rosso: la scheda appare sopra la pagina.")
+                        Text("4. Tocca Chiudi per continuare la lettura.")
+                        Text("Puoi spostare il pulsante rosso trascinandolo sul bordo dello schermo.")
                         HorizontalDivider()
                         Text("RICERCA DI PROVA", style = MaterialTheme.typography.titleMedium)
                         OutlinedTextField(value = query, onValueChange = { query = it }, label = { Text("Cerca una parola") }, modifier = Modifier.fillMaxWidth())
@@ -53,8 +58,8 @@ class MainActivity : ComponentActivity() {
                             Text(result.definition)
                             Text("Sinonimi: " + result.synonyms.joinToString(", "))
                             Text("Approfondimento: " + result.encyclopedia)
-                        } else Text("Nessun risultato nel dizionario dimostrativo.")
-                        Text("Parole incluse nella demo: perseveranza, mitezza, integrità, discernimento, costanza, saggezza.", style = MaterialTheme.typography.bodySmall)
+                        } else if (query.isNotBlank()) Text("Nessun risultato. Prova un'altra parola.")
+                        Text("Le definizioni, i sinonimi e gli esempi dipendono dalle informazioni disponibili nella fonte del dizionario.", style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }

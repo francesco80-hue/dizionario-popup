@@ -1,7 +1,9 @@
 package it.francesco.dizionariopopup
 
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import org.json.JSONArray
+import java.io.File
 import java.text.Normalizer
 import java.util.Locale
 
@@ -16,41 +18,56 @@ data class Entry(
 )
 
 object Dictionary {
-    @Volatile private var entries: List<Entry>? = null
+    private const val DATABASE_NAME = "dictionary.db"
 
+    @Synchronized
     fun find(context: Context, query: String): Entry? {
-        val all = entries ?: synchronized(this) {
-            entries ?: load(context).also { entries = it }
-        }
-        val q = fold(query.trim())
+        val q = fold(query)
         if (q.isBlank()) return null
-        return all.firstOrNull { fold(it.word) == q }
-            ?: all.firstOrNull { entry -> entry.aliases.any { fold(it) == q } }
-            ?: all.firstOrNull { fold(it.word).startsWith(q) }
+        val database = openDatabase(context)
+        return try {
+            findByKey(database, "SELECT id, word, pos, definition, synonyms, examples, encyclopedia FROM entries WHERE word_key = ? LIMIT 1", q)
+                ?: findByKey(database, "SELECT e.id, e.word, e.pos, e.definition, e.synonyms, e.examples, e.encyclopedia FROM aliases a JOIN entries e ON e.id = a.entry_id WHERE a.alias_key = ? LIMIT 1", q)
+                ?: findByKey(database, "SELECT id, word, pos, definition, synonyms, examples, encyclopedia FROM entries WHERE word_key LIKE ? ORDER BY word_key LIMIT 1", q.replace("%", "\\%").replace("_", "\\_") + "%")
+        } finally {
+            database.close()
+        }
     }
 
-    private fun load(context: Context): List<Entry> {
-        val raw = context.assets.open("dictionary.json").bufferedReader().use { it.readText() }
-        val arr = JSONArray(raw)
-        return (0 until arr.length()).map { i ->
-            val o = arr.getJSONObject(i)
-            Entry(
-                word = o.getString("word"),
-                pos = o.optString("pos"),
-                definition = o.optString("definition"),
-                synonyms = o.optJSONArray("synonyms").toStringList(),
-                examples = o.optJSONArray("examples").toStringList(),
-                encyclopedia = o.optString("encyclopedia"),
-                aliases = o.optJSONArray("aliases").toStringList()
+    private fun openDatabase(context: Context): SQLiteDatabase {
+        val target = context.getDatabasePath(DATABASE_NAME)
+        if (!target.exists()) {
+            target.parentFile?.let { if (!it.exists()) it.mkdirs() }
+            context.assets.open(DATABASE_NAME).use { input ->
+                target.outputStream().use { output -> input.copyTo(output, bufferSize = 32 * 1024) }
+            }
+        }
+        return SQLiteDatabase.openDatabase(target.absolutePath, null, SQLiteDatabase.OPEN_READONLY)
+    }
+
+    private fun findByKey(database: SQLiteDatabase, sql: String, key: String): Entry? {
+        database.rawQuery(sql, arrayOf(key)).use { cursor ->
+            if (!cursor.moveToFirst()) return null
+            return Entry(
+                word = cursor.getString(1),
+                pos = cursor.getString(2),
+                definition = cursor.getString(3),
+                synonyms = parseList(cursor.getString(4)),
+                examples = parseList(cursor.getString(5)),
+                encyclopedia = cursor.getString(6),
+                aliases = emptyList()
             )
         }
     }
 
-    private fun JSONArray?.toStringList(): List<String> =
-        if (this == null) emptyList() else (0 until length()).map { getString(it) }
+    private fun parseList(value: String?): List<String> =
+        if (value.isNullOrBlank()) emptyList() else {
+            val array = JSONArray(value)
+            (0 until array.length()).map { array.getString(it) }
+        }
 
-    private fun fold(s: String): String =
-        Normalizer.normalize(s.lowercase(Locale.ITALIAN), Normalizer.Form.NFD)
+    private fun fold(value: String): String =
+        Normalizer.normalize(value.trim().lowercase(Locale.ITALIAN), Normalizer.Form.NFD)
             .replace("\\p{Mn}+".toRegex(), "")
             .replace('’', '\'')
             .trim()

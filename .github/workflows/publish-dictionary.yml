@@ -1,0 +1,43 @@
+name: Publish dictionary database
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 5 14 * *'
+
+permissions:
+  contents: write
+
+jobs:
+  dictionary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download Italian dictionary source
+        run: |
+          mkdir -p build-data
+          curl -L --fail --retry 3 https://kaikki.org/itwiktionary/raw-wiktextract-data.jsonl.gz -o build-data/itwiktionary.jsonl.gz
+      - name: Build offline dictionary database
+        run: python3 tools/build_dictionary.py
+      - name: Validate database
+        run: |
+          python3 - <<'PY'
+          import sqlite3
+          db = sqlite3.connect("app/src/main/assets/dictionary.db")
+          count = db.execute("SELECT COUNT(*) FROM entries").fetchone()[0]
+          assert count > 1000, f"Database unexpectedly small: {count}"
+          assert db.execute("SELECT COUNT(*) FROM entries WHERE word_key='sacrificare'").fetchone()[0] == 1
+          print(f"Validated {count} dictionary entries")
+          db.close()
+          PY
+      - name: Publish versioned database release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: dictionary-${{ github.run_number }}-${{ github.run_id }}
+          name: Dizionario italiano ${{ github.run_number }}
+          body: |
+            Database offline aggiornato automaticamente da Kaikki/Wiktextract.
+            Include le voci curate del progetto.
+          files: app/src/main/assets/dictionary.db
+          make_latest: true

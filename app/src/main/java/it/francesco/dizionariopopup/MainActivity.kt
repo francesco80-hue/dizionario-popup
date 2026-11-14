@@ -28,7 +28,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold { padding ->
                     Column(Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Text("Dizionario Popup", style = MaterialTheme.typography.headlineLarge)
-                        Text("Consulta le parole mentre leggi, senza uscire da JW Library. Dizionario offline: nessun account, pubblicità o connessione Internet.")
+                        Text("Consulta le parole mentre leggi, senza interrompere la lettura. Il dizionario funziona offline; gli approfondimenti online sono facoltativi. Nessun account o pubblicità.")
                         HorizontalDivider()
                         Text("PULSANTE MOBILE", style = MaterialTheme.typography.titleMedium)
                         Text(if (overlayGranted) "Permesso finestra mobile autorizzato." else "Per mostrare l'icona sopra JW Library serve il permesso Android 'Mostra sopra altre app'.")
@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
                         Text("COME SI USA")
                         Text("1. In JW Library, tieni premuta la parola che vuoi cercare.")
                         Text("2. Tocca Copia nel menu.")
-                        Text("3. Tocca il libro rosso: la scheda appare sopra la pagina.")
+                        Text("3. Tocca il libro rosso: la scheda appare sopra l’app che stai usando.")
                         Text("4. Tocca Chiudi per continuare la lettura.")
                         Text("Puoi spostare il pulsante rosso trascinandolo sul bordo dello schermo.")
                         HorizontalDivider()
@@ -57,9 +57,9 @@ class MainActivity : ComponentActivity() {
                             Text(result.word, style = MaterialTheme.typography.headlineMedium)
                             Text(result.definition)
                             Text("Sinonimi: " + result.synonyms.joinToString(", "))
-                            Text("Approfondimento: " + result.encyclopedia)
+                            if (result.examples.isNotEmpty()) Text("Esempio: " + result.examples.first)
                         } else if (query.isNotBlank()) Text("Nessun risultato. Prova un'altra parola.")
-                        Text("Le definizioni, i sinonimi e gli esempi dipendono dalle informazioni disponibili nella fonte del dizionario.", style = MaterialTheme.typography.bodySmall)
+                        Text("Google, Wikipedia e altre fonti si aprono solo su richiesta e richiedono Internet. Il dizionario continua a funzionare offline.", style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }

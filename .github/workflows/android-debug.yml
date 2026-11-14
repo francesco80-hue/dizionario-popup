@@ -37,9 +37,27 @@ jobs:
           gradle-version: '8.9'
       - name: Build debug APK
         run: gradle --no-daemon assembleDebug
-      - name: Upload APK
+      - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: DizionarioPopup-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Prepare stable signing key
+        if: ${{ secrets.SIGNING_KEYSTORE_BASE64 != '' && secrets.SIGNING_KEYSTORE_PASSWORD != '' }}
+        env:
+          SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+        run: |
+          echo "$SIGNING_KEYSTORE_BASE64" | base64 --decode > app/release-key.jks
+      - name: Build stable signed APK
+        if: ${{ secrets.SIGNING_KEYSTORE_BASE64 != '' && secrets.SIGNING_KEYSTORE_PASSWORD != '' }}
+        env:
+          SIGNING_KEYSTORE_PASSWORD: ${{ secrets.SIGNING_KEYSTORE_PASSWORD }}
+        run: gradle --no-daemon assembleRelease
+      - name: Upload stable signed APK
+        if: ${{ secrets.SIGNING_KEYSTORE_BASE64 != '' && secrets.SIGNING_KEYSTORE_PASSWORD != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: DizionarioPopup-stable-signed-apk
+          path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error

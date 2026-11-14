@@ -21,3 +21,7 @@ Fonti e licenze: vedere [DICTIONARY-LICENSE.md](DICTIONARY-LICENSE.md).
 ## Compilazione
 
 Aprire Actions nel repository e scaricare l'artifact DizionarioPopup-debug-apk dell'ultima esecuzione completata con successo.
+
+## Versione 0.3.0
+
+La compilazione produce un APK di prova e, quando sono configurati i segreti di firma GitHub Actions, anche un APK release firmato per gli aggiornamenti.

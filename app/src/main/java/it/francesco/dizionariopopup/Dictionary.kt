@@ -3,7 +3,6 @@ package it.francesco.dizionariopopup
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import org.json.JSONArray
-import java.io.File
 import java.text.Normalizer
 import java.util.Locale
 
@@ -28,7 +27,7 @@ object Dictionary {
         return try {
             findByKey(database, "SELECT id, word, pos, definition, synonyms, examples, encyclopedia FROM entries WHERE word_key = ? LIMIT 1", q)
                 ?: findByKey(database, "SELECT e.id, e.word, e.pos, e.definition, e.synonyms, e.examples, e.encyclopedia FROM aliases a JOIN entries e ON e.id = a.entry_id WHERE a.alias_key = ? LIMIT 1", q)
-                ?: findByKey(database, "SELECT id, word, pos, definition, synonyms, examples, encyclopedia FROM entries WHERE word_key LIKE ? ORDER BY word_key LIMIT 1", q.replace("%", "\\%").replace("_", "\\_") + "%")
+                ?: findByKey(database, "SELECT id, word, pos, definition, synonyms, examples, encyclopedia FROM entries WHERE word_key LIKE ? ESCAPE '\\' ORDER BY word_key LIMIT 1", q.replace("%", "\\%").replace("_", "\\_") + "%")
         } finally {
             database.close()
         }

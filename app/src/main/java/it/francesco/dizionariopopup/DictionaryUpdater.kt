@@ -19,7 +19,7 @@ object DictionaryUpdater {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val last = prefs.getLong(KEY_LAST_CHECK, 0L)
         if (System.currentTimeMillis() - last < 24L * 60L * 60L * 1000L) return
-        checkAndInstall(context.applicationContext, wifiOnly = true, showMessage = false)
+        checkAndInstall(context.applicationContext, wifiOnly = prefs.getBoolean("wifi_only", true), showMessage = false)
     }
 
     fun checkManually(context: Context, wifiOnly: Boolean) {

@@ -4,10 +4,13 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
+import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import android.view.Gravity
@@ -19,6 +22,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import kotlin.math.abs
 
@@ -26,12 +30,17 @@ class FloatingButtonService : Service() {
     private var windowManager: WindowManager? = null
     private var bubble: TextView? = null
     private var popup: View? = null
-    private var layoutParams: WindowManager.LayoutParams? = null
     private var downRawX = 0f
     private var downRawY = 0f
     private var startX = 0
     private var startY = 0
     private var dragged = false
+
+    private val ink = Color.rgb(48, 43, 51)
+    private val muted = Color.rgb(119, 111, 121)
+    private val accent = Color.rgb(190, 43, 65)
+    private val paper = Color.rgb(255, 253, 250)
+    private val soft = Color.rgb(249, 241, 241)
 
     override fun onCreate() {
         super.onCreate()
@@ -70,13 +79,13 @@ class FloatingButtonService : Service() {
             textSize = 21f
             setTextColor(Color.WHITE)
             gravity = Gravity.CENTER
-            alpha = 0.92f
+            alpha = 0.96f
             background = GradientDrawable().apply {
                 shape = GradientDrawable.OVAL
-                setColor(Color.rgb(210, 45, 65))
-                setStroke(dp(1), Color.argb(150, 255, 255, 255))
+                setColor(accent)
+                setStroke(dp(1), Color.argb(170, 255, 255, 255))
             }
-            elevation = dp(5).toFloat()
+            elevation = dp(6).toFloat()
         }
         bubble = view
         val prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
@@ -89,7 +98,6 @@ class FloatingButtonService : Service() {
             x = prefs.getInt("bubble_x", dp(10))
             y = prefs.getInt("bubble_y", 0)
         }
-        layoutParams = params
 
         view.setOnTouchListener { _, event ->
             when (event.action) {
@@ -120,7 +128,9 @@ class FloatingButtonService : Service() {
                             .putInt("bubble_y", params.y)
                             .apply()
                     } else {
-                        val capture = Intent(this@FloatingButtonService, ClipboardCaptureActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION) }
+                        val capture = Intent(this@FloatingButtonService, ClipboardCaptureActivity::class.java).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                        }
                         startActivity(capture)
                     }
                     true
@@ -153,75 +163,132 @@ class FloatingButtonService : Service() {
 
         val panel = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(dp(22), dp(18), dp(22), dp(14))
-            background = GradientDrawable().apply {
-                setColor(Color.rgb(255, 248, 252))
-                cornerRadius = dp(18).toFloat()
-                setStroke(dp(1), Color.rgb(225, 215, 225))
-            }
-            elevation = dp(12).toFloat()
+            setPadding(dp(20), dp(16), dp(20), dp(14))
+            background = rounded(paper, 24, Color.rgb(235, 225, 225))
+            elevation = dp(16).toFloat()
         }
 
         val header = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
         }
-        val title = TextView(this).apply {
-            text = "Dizionario Popup"
-            textSize = 18f
-            setTextColor(Color.rgb(55, 45, 60))
+        val brand = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
         }
-        header.addView(title, LinearLayout.LayoutParams(0, dp(44), 1f))
-        val close = Button(this).apply {
-            text = "Chiudi"
-            setTextColor(Color.rgb(175, 35, 60))
+        brand.addView(label("DIZIONARIO POPUP", 10f, accent, true, 0))
+        brand.addView(label("La parola, mentre leggi", 13f, muted, false, 2))
+        header.addView(brand, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+        val close = TextView(this).apply {
+            text = "✕"
+            textSize = 18f
+            gravity = Gravity.CENTER
+            setTextColor(muted)
+            background = rounded(soft, 30)
+            setPadding(dp(12), dp(8), dp(12), dp(8))
+            contentDescription = "Chiudi"
             setOnClickListener { closeLookupPopup() }
         }
         header.addView(close)
         panel.addView(header)
 
-        val scroll = ScrollView(this)
+        val scroll = ScrollView(this).apply {
+            isFillViewport = false
+            clipToPadding = false
+            setPadding(0, dp(12), 0, dp(2))
+        }
         val body = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(0, dp(8), 0, dp(8))
-        }
-        fun addText(value: String, size: Float, color: Int = Color.rgb(45, 40, 48), bold: Boolean = false, top: Int = 8) {
-            val text = TextView(this).apply {
-                this.text = value
-                textSize = size
-                setTextColor(color)
-                if (bold) setTypeface(typeface, android.graphics.Typeface.BOLD)
-                setPadding(0, dp(top), 0, dp(3))
-            }
-            body.addView(text)
         }
 
-        if (entry != null) {
-            addText(entry.word, 27f, Color.rgb(45, 40, 48), true, 4)
-            if (entry.pos.isNotBlank()) addText(entry.pos, 13f, Color.rgb(130, 75, 145), false, 2)
-            addText("VOCABOLARIO", 14f, Color.rgb(65, 55, 65), true, 14)
-            addText(entry.definition, 17f)
-            if (entry.synonyms.isNotEmpty()) {
-                addText("Sinonimi", 15f, Color.rgb(65, 55, 65), true, 12)
-                addText(entry.synonyms.joinToString(" · "), 16f)
-            }
-            if (entry.examples.isNotEmpty()) {
-                addText("Esempio", 15f, Color.rgb(65, 55, 65), true, 12)
-                entry.examples.forEach { addText("“$it”", 16f) }
-            }
-            addText("APPROFONDIMENTO ENCICLOPEDICO", 14f, Color.rgb(65, 55, 65), true, 16)
-            addText(entry.encyclopedia.ifBlank { "Nessun approfondimento enciclopedico disponibile per questa voce." }, 16f)
+        if (word.isBlank()) {
+            val emptyCard = sectionCard()
+            emptyCard.addView(label("Nessuna parola copiata", 21f, ink, true, 0))
+            emptyCard.addView(label("Copia una parola in un'app e tocca il pulsante rosso del dizionario.", 14f, muted, false, 8))
+            body.addView(emptyCard)
         } else {
-            addText(word.ifBlank { "Nessuna parola copiata" }, 24f, Color.rgb(45, 40, 48), true, 8)
-            addText(if (word.isBlank()) "Copia una parola in JW Library e tocca il libro rosso." else "La parola non è presente nel dizionario.", 16f)
+            val wordCard = sectionCard()
+            wordCard.addView(label(word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }, 27f, ink, true, 0))
+            if (entry?.pos?.isNotBlank() == true) {
+                wordCard.addView(label(entry.pos, 13f, accent, true, 4))
+            }
+            body.addView(wordCard)
+
+            if (entry != null) {
+                val definitionCard = sectionCard()
+                definitionCard.addView(label("SIGNIFICATO", 10f, accent, true, 0))
+                definitionCard.addView(label(entry.definition, 16f, ink, false, 7))
+                body.addView(definitionCard)
+
+                if (entry.synonyms.isNotEmpty()) {
+                    val synonymsCard = sectionCard()
+                    synonymsCard.addView(label("SINONIMI", 10f, accent, true, 0))
+                    synonymsCard.addView(label(entry.synonyms.joinToString("  ·  "), 14f, ink, false, 6))
+                    body.addView(synonymsCard)
+                }
+                if (entry.examples.isNotEmpty()) {
+                    val examplesCard = sectionCard()
+                    examplesCard.addView(label(if (entry.examples.size == 1) "ESEMPIO" else "ESEMPI", 10f, accent, true, 0))
+                    entry.examples.take(2).forEachIndexed { index, example ->
+                        examplesCard.addView(label("“$example”", 14f, ink, false, if (index == 0) 6 else 10))
+                    }
+                    body.addView(examplesCard)
+                }
+            } else {
+                val missingCard = sectionCard()
+                missingCard.addView(label("Voce non presente nel dizionario offline", 14f, ink, true, 0))
+                missingCard.addView(label("Puoi comunque cercarla nelle fonti online qui sotto.", 13f, muted, false, 5))
+                body.addView(missingCard)
+            }
+
+            // Approfondimenti volutamente compatti e chiusi all'apertura.
+            val sourcesCard = sectionCard()
+            val sourceHeader = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(0, dp(2), 0, dp(2))
+            }
+            val sourceTitle = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+            sourceTitle.addView(label("APPROFONDISCI", 10f, accent, true, 0))
+            sourceTitle.addView(label("Altre informazioni, solo se ti servono", 12f, muted, false, 3))
+            sourceHeader.addView(sourceTitle, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+            val expandIcon = TextView(this).apply {
+                text = "＋"
+                textSize = 21f
+                setTextColor(accent)
+                gravity = Gravity.CENTER
+            }
+            sourceHeader.addView(expandIcon, LinearLayout.LayoutParams(dp(34), dp(34)))
+            sourcesCard.addView(sourceHeader)
+
+            val sourceLinks = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                visibility = View.GONE
+                setPadding(0, dp(8), 0, 0)
+            }
+            sourceLinks.addView(sourceRow("Google", "Cerca significato e utilizzi", "G") {
+                openWeb("https://www.google.com/search?q=" + Uri.encode("$word significato"))
+            })
+            sourceLinks.addView(sourceRow("Wikipedia", "Cerca una voce enciclopedica", "W") {
+                openWeb("https://it.wikipedia.org/w/index.php?search=" + Uri.encode(word))
+            })
+            sourceLinks.addView(sourceRow("Altre fonti", "Dizionari e risorse linguistiche", "↗") {
+                openWeb("https://www.google.com/search?q=" + Uri.encode("site:treccani.it/vocabolario $word"))
+            })
+            sourcesCard.addView(sourceLinks)
+            sourceHeader.setOnClickListener {
+                val expanded = sourceLinks.visibility != View.VISIBLE
+                sourceLinks.visibility = if (expanded) View.VISIBLE else View.GONE
+                expandIcon.text = if (expanded) "−" else "＋"
+            }
+            body.addView(sourcesCard)
         }
 
         scroll.addView(body)
         panel.addView(scroll, LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, dp(360)
+            LinearLayout.LayoutParams.MATCH_PARENT, dp(430)
         ))
         popup = panel
-        val width = (resources.displayMetrics.widthPixels * 0.90f).toInt().coerceAtMost(dp(560))
+        val width = (resources.displayMetrics.widthPixels * 0.92f).toInt().coerceAtMost(dp(560))
         val params = WindowManager.LayoutParams(
             width, WindowManager.LayoutParams.WRAP_CONTENT, overlayType(),
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
@@ -234,6 +301,73 @@ class FloatingButtonService : Service() {
             bubble?.visibility = View.VISIBLE
         }
     }
+
+    private fun sectionCard(): LinearLayout = LinearLayout(this).apply {
+        orientation = LinearLayout.VERTICAL
+        setPadding(dp(14), dp(12), dp(14), dp(12))
+        background = rounded(Color.rgb(255, 255, 255), 16, Color.rgb(241, 234, 234))
+        val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        lp.bottomMargin = dp(9)
+        layoutParams = lp
+    }
+
+    private fun label(value: String, size: Float, color: Int, bold: Boolean, top: Int): TextView =
+        TextView(this).apply {
+            text = value
+            textSize = size
+            setTextColor(color)
+            if (bold) setTypeface(typeface, Typeface.BOLD)
+            includeFontPadding = true
+            setPadding(0, dp(top), 0, 0)
+            setLineSpacing(dp(2).toFloat(), 1f)
+        }
+
+    private fun sourceRow(title: String, subtitle: String, mark: String, action: () -> Unit): View {
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(dp(2), dp(9), dp(2), dp(9))
+            isClickable = true
+            isFocusable = true
+            setOnClickListener { action() }
+        }
+        val icon = TextView(this).apply {
+            text = mark
+            textSize = 15f
+            gravity = Gravity.CENTER
+            setTextColor(accent)
+            background = rounded(soft, 10)
+        }
+        row.addView(icon, LinearLayout.LayoutParams(dp(36), dp(36)))
+        val texts = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(11), 0, 0, 0)
+            addView(label(title, 14f, ink, true, 0))
+            addView(label(subtitle, 11f, muted, false, 3))
+        }
+        row.addView(texts, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
+        row.addView(TextView(this).apply {
+            text = "↗"
+            textSize = 17f
+            setTextColor(muted)
+        })
+        return row
+    }
+
+    private fun openWeb(url: String) {
+        try {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(this, "Nessun browser disponibile per aprire il collegamento.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun rounded(color: Int, radiusDp: Int, stroke: Int? = null): GradientDrawable =
+        GradientDrawable().apply {
+            setColor(color)
+            cornerRadius = dp(radiusDp).toFloat()
+            if (stroke != null) setStroke(dp(1), stroke)
+        }
 
     private fun closeLookupPopup() {
         popup?.let { try { windowManager?.removeView(it) } catch (_: Exception) {} }

@@ -219,12 +219,15 @@ class FloatingButtonService : Service() {
                 definitionCard.addView(label(entry.definition, 16f, ink, false, 7))
                 body.addView(definitionCard)
 
-                if (entry.synonyms.isNotEmpty()) {
-                    val synonymsCard = sectionCard()
-                    synonymsCard.addView(label("SINONIMI", 10f, accent, true, 0))
-                    synonymsCard.addView(label(entry.synonyms.joinToString("  ·  "), 14f, ink, false, 6))
-                    body.addView(synonymsCard)
+                val synonymsCard = sectionCard()
+                synonymsCard.addView(label("SINONIMI E TERMINI AFFINI", 10f, accent, true, 0))
+                val synonymText = if (entry.synonyms.isNotEmpty()) {
+                    entry.synonyms.distinct().take(12).joinToString("  ·  ")
+                } else {
+                    "Per questa voce non sono ancora disponibili sinonimi verificati."
                 }
+                synonymsCard.addView(label(synonymText, 14f, ink, false, 6))
+                body.addView(synonymsCard)
                 if (entry.examples.isNotEmpty()) {
                     val examplesCard = sectionCard()
                     examplesCard.addView(label(if (entry.examples.size == 1) "ESEMPIO" else "ESEMPI", 10f, accent, true, 0))

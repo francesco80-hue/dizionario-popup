@@ -20,9 +20,9 @@ class LookupActivity : ComponentActivity() {
         if (!intent.getBooleanExtra(EXTRA_READ_CLIPBOARD, false)) showLookup()
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (intent.getBooleanExtra(EXTRA_READ_CLIPBOARD, false) && !shownForCurrentIntent) {
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus && intent.getBooleanExtra(EXTRA_READ_CLIPBOARD, false) && !shownForCurrentIntent) {
             shownForCurrentIntent = true
             showLookup()
         }

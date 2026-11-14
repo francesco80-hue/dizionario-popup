@@ -4,7 +4,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.ClipboardManager
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
@@ -121,7 +120,8 @@ class FloatingButtonService : Service() {
                             .putInt("bubble_y", params.y)
                             .apply()
                     } else {
-                        showLookupPopup()
+                        val capture = Intent(this@FloatingButtonService, ClipboardCaptureActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_ANIMATION) }
+                        startActivity(capture)
                     }
                     true
                 }

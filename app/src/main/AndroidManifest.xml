@@ -11,6 +11,13 @@
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
 
         <activity
+            android:name=".ClipboardCaptureActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@style/Theme.DizionarioPopup.Transparent" />
+
+        <activity
             android:name=".LookupActivity"
             android:exported="true"
             android:excludeFromRecents="true"
